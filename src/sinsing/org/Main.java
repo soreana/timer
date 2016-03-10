@@ -22,12 +22,13 @@ public class Main {
 
         // scheduling the task at interval
         timer.schedule(tasknew, delay);
+        System.exit(0);
     }
 
     private static class TimerScheduleDelay extends TimerTask {
         @Override
         public void run() {
-            System.out.println("Alarm");
+            System.out.println("Alarm !");
         }
     }
 }
