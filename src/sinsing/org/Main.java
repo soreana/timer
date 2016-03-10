@@ -1,13 +1,22 @@
 package sinsing.org;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.SynchronousQueue;
 
 public class Main {
+    private static MediaPlayer mediaPlayer;
 
     public static void main(String[] args) {
+        String path= System.getProperty("user.dir") + "/public/alarm/Alarm.mp3";
+        Media hit = new Media(Paths.get(path).toUri().toString());
+        mediaPlayer = new MediaPlayer(hit);
+        mediaPlayer.play();
+
         // creating timer task, timer
         TimerTask tasknew = new TimerScheduleDelay();
         Timer timer = new Timer();
@@ -24,6 +33,7 @@ public class Main {
         timer.schedule(tasknew, delay);
         System.exit(0);
     }
+
 
     private static class TimerScheduleDelay extends TimerTask {
         @Override
