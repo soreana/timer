@@ -1,44 +1,69 @@
 package sinsing.org;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
-import java.nio.file.Paths;
+import javax.sound.sampled.*;
+
+import java.io.File;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
-    private static MediaPlayer mediaPlayer;
+    public static synchronized void play(final String fileName , final int count)
+    {
+        // Note: use .wav files
+        new Thread(new Runnable() {
+            public void run() {
+                String filePath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath() + fileName;
+                try {
+                    Clip clip = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File(filePath));
+                    clip.open(inputStream);
+                    clip.loop(count);
+                } catch (Exception e) {
+                    System.out.println("play sound error: " + e.getMessage() + " for " + filePath);
+                }
+            }
+        }).start();
+    }
 
-    public static void main(String[] args) {
-        String path= System.getProperty("user.dir") + "/public/alarm/Alarm.mp3";
-        Media hit = new Media(Paths.get(path).toUri().toString());
-        mediaPlayer = new MediaPlayer(hit);
-        mediaPlayer.play();
+    public static long delayCalculator( String [] args ){
+        long delay = 0 ;
+
+        if( args.length != 3) {
+            Scanner console = new Scanner(System.in);
+            System.out.print( "input hours: ");
+            delay = console.nextInt() * 3_600_000;
+            System.out.print( "input minutes: ");
+            delay += console.nextInt() * 60_000 ;
+            System.out.print( "input seconds: ");
+            delay += console.nextInt() * 1000 ;
+        } else {
+            delay += Integer.parseInt(args[0]) * 3_600_000;
+            delay += Integer.parseInt(args[1]) * 60_000;
+            delay += Integer.parseInt(args[2]) * 1000;
+        }
+
+        return delay;
+    }
+
+    public static void main(String[] args) throws Exception{
+
+        long delay = delayCalculator( args );
 
         // creating timer task, timer
-        TimerTask tasknew = new TimerScheduleDelay();
-        Timer timer = new Timer();
-
-        Scanner console = new Scanner(System.in);
-        System.out.print( "input hours: ");
-        long delay = console.nextInt() * 3_600_000;
-        System.out.print( "input minutes: ");
-        delay += console.nextInt() * 60_000 ;
-        System.out.print( "input seconds: ");
-        delay += console.nextInt() * 1000 ;
+        TimerTask newTask = new TimerScheduleDelay();
+        Timer timer = new Timer("TimerThread");
 
         // scheduling the task at interval
-        timer.schedule(tasknew, delay);
-        System.exit(0);
+        timer.schedule(newTask, delay);
     }
 
 
     private static class TimerScheduleDelay extends TimerTask {
         @Override
         public void run() {
-            System.out.println("Alarm !");
+            play("../public/alarm/Alarm.wav", 99);
         }
     }
 }
